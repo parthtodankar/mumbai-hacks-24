@@ -11,13 +11,13 @@ os.environ["GROQ_API_KEY"] = 'gsk_JYkanft7jvoQciK8NSduWGdyb3FY6EgqGAJ9ZtqIGdt5XG
 model = Ollama(model="llama3.2")
 
 # Title of the app
-st.title("Academic Support Tool")
+st.title("Academic Support Tool \n by Team [Matrix] at Mumbai Hacks 24")
 
 # Create input fields for each question
 student_id = st.text_input("1. Student ID:")
 name = st.text_input("2. Name:")
 learning_style = st.selectbox("3. Learning Style:", options=["Visual", "Auditory", "Kinesthetic"])
-diversity_factor = st.selectbox("4. Diversity Factors:", options=["English", "Hispanic", "Other"])
+diversity_factor = st.selectbox("4. Diversity Factors:", options=["English", "Hispanic", "Learning and Physical Abilities", "Gender Identity", "Mental Health", "Geographic Location"])
 engagement_level = st.selectbox("5. Engagement Level:", options=["High", "Medium", "Low"])
 performance_metrics = st.number_input("6. Performance Metrics (out of 100):", min_value=0, max_value=100)
 motivation_level = st.selectbox("7. Motivation Level:", options=["Very Motivated", "Somewhat Motivated", "Not Motivated"])
@@ -26,7 +26,7 @@ parental_involvement = st.selectbox("9. Parental Involvement:", options=["High",
 extracurricular_activities = st.text_input("10. Extracurricular Activities:")
 social_interaction_preference = st.selectbox("11. Social Interaction Preference:", options=["Group", "Individual"])
 learning_environment = st.selectbox("12. Learning Environment:", options=["Quiet", "Collaborative", "Structured"])
-study_habits = st.text_area("13. Study Habits:")
+study_habits = st.selectbox("13. Study Habits:", options=["Daily Review", "Last-minute cramming", "Mind Mapping", "Flashcards"])
 peer_relationships = st.selectbox("14. Peer Relationships:", options=["Positive", "Neutral", "Negative"])
 
 # Button to submit the questionnaire
@@ -64,9 +64,18 @@ if st.button("Submit"):
         f"My peer relationship is {student_info['peer_relationships']}"
         "Give me a solution to improve myself academically."
     )
-    # Generate response using the model
-    response = model.generate([prompt])  # Wrap prompt in a list
+    try:
+        # Use invoke instead of generate
+        response = model.invoke(prompt)
+        
+        # Display the output in the Streamlit app
+        st.write("Personalized Academic Solution:")
+        st.write(response)
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
 
-    # Display the output in the Streamlit app
-    st.write("Personalized Academic Solution:")
-    st.write(response)  # Access the first element of the response list
+
+footer_html = """<div style='text-align: center;'>
+  <p>Developed with ❤️ by team [Matrix] (Parth and Neel)</p>
+</div>"""
+st.markdown(footer_html, unsafe_allow_html=True)
