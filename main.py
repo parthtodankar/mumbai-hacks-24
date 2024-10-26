@@ -1,16 +1,14 @@
 import os
 from langchain_community.llms import Ollama
-from crewai import Agent, Task, Crew, Process
 import streamlit as st
 
-# Initialize the model
-model = Ollama(model="llama3")
-is_verbose = False
-
 # Set environment variables
-os.environ["OPENAI_API_BASE"] = 'https://api.groq.com/openai/v1'
-os.environ["OPENAI_MODEL_NAME"] = 'llama-3.1-8b-instant'
-os.environ["OPENAI_API_KEY"] = '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'
+os.environ["OpenAi_API_BASE"] = 'https://api.groq.com/openai/v1'
+os.environ["Llama_MODEL_NAME"] = 'llama-3.1-8b-instant'
+os.environ["GROQ_API_KEY"] = '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'
+
+# Initialize the model
+model = Ollama(model="llama3.2")
 
 # Title of the app
 st.title("Academic Support Tool")
@@ -51,11 +49,10 @@ if st.button("Submit"):
         "peer_relationships": peer_relationships
     }
     
-     # Create prompt for LLaMA
     prompt = (
         f"I am {student_info['name']}. My learning style is {student_info['learning_style']}. "
         f"My diversity factor is {student_info['diversity_factor']}. "
-        f"My engagement level is {student_info['dengagement_level']}"
+        f"My engagement level is {student_info['engagement_level']}"
         f"My performance metrics are {student_info['performance_metrics']}/100"
         f"My motivation level is {student_info['motivation_level']}"
         f"Challenges I face are {student_info['challenges_faced']}"
@@ -67,29 +64,9 @@ if st.button("Submit"):
         f"My peer relationship is {student_info['peer_relationships']}"
         "Give me a solution to improve myself academically."
     )
+    # Generate response using the model
+    response = model.generate([prompt])  # Wrap prompt in a list
 
-    guru = Agent(
-        role="Academic Support Tool for Students",
-        goal="To understand the needs of students and help them with personalised solution",
-        backstory="You are an AI assistant whose only job is to understand the individual needs of the students and provide them with a personalised solution to make them successful in their life",
-        verbose=True,
-        allow_delegation=False,
-        llm=model
-    )
-
-    response = Task(
-        description=f"Respond to the prompt: '{prompt}' based on the metrics provided by the student.",
-        agent=guru,
-        expected_output="Give a suitable and personalised solution to each student"
-    )
-
-    crew = Crew(
-        agents=[guru],  # Wrap the agent in a list
-        tasks=[response],  # Wrap the task in a list
-        verbose=1,
-        process=Process.sequential
-    )
-
-    output = crew.kickoff()
-    print("Crew Output:", output)
-    st.write(output)  # Display the output in the Streamlit app
+    # Display the output in the Streamlit app
+    st.write("Personalized Academic Solution:")
+    st.write(response)  # Access the first element of the response list
